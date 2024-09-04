@@ -13,7 +13,7 @@ internal class CS2TypeScript
 	public int RED2_Offset {get; set;} = 0;
 	public int RED2_Size {get; set;} = 0;
 
-	public string? Data {get; set;}
+	public string Data {get; set;}
 	public int Data_Offset {get; set;} = 0;
 	public int Data_Size {get; set;} = 0;
 
@@ -22,20 +22,13 @@ internal class CS2TypeScript
 	public int STAT_Size {get; set;} = 0;
 
 	internal CS2TypeScript(string path) {
-		var ext = Path.GetExtension(path).Trim();
-		if (ext == ".vts") {
-			using var streamFile = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-			var buffer = new byte[streamFile.Length];
-			var bytesRead = streamFile.Read(buffer, 0, buffer.Length);
-			this.Data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-		}
+		using var streamFile = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+		var buffer = new byte[streamFile.Length];
+		var bytesRead = streamFile.Read(buffer, 0, buffer.Length);
+		this.Data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 	}
 
-	internal bool Save(string fPath) {
-		if (this.Data == null) {
-			return false;
-		}
-
+	internal void Save(string fPath) {
 		this.Data_Size = this.Data.Length;
 		var newData = new List<byte>();
 		var STATBytes = CS2KV3.Serialize(this.Data);
@@ -66,7 +59,5 @@ internal class CS2TypeScript
 		newData.AddRange(STATBytes); //size
 		
 		File.WriteAllBytes(fPath, newData.ToArray());
-
-		return true;
 	}
 }
