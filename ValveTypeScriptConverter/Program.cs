@@ -6,7 +6,8 @@ namespace ValveTypeScriptConverter;
 internal class Program
 {
 	static void Main(string[] args) {
-		/*
+		Console.WriteLine($"ValveTypeScriptConverter v{BuildNo()}");
+
 		if (args.Length != 1) {
 			Console.WriteLine("Usage: ValveTypeScriptConverter <addonPath>");
 			Console.WriteLine("  addonPath: The path to the root of the addons content folder");
@@ -15,9 +16,6 @@ internal class Program
 		}
 
 		var contentPath = args[^1];
-		*/
-
-		var contentPath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Counter-Strike Global Offensive\\content\\csgo_addons\\warden";
 
 		if (!Directory.Exists(contentPath)) {
 			Console.WriteLine(
@@ -27,6 +25,10 @@ internal class Program
 
 		var app = new Application(contentPath);
 		app.Run();
+	}
+
+	internal static string BuildNo() {
+		return "1";
 	}
 }
 
