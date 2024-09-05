@@ -4,22 +4,11 @@ namespace ValveTypeScriptConverter;
 
 internal class CS2TypeScript
 {
-	public int FileSize {get; set;}
-	public int unknown {get; set;} = 131084;
-	public int Version {get; set;} = 8;
-	public int unknown2 {get; set;} = 3;
+	private static readonly int unknown = 131084;
+	private static readonly int Version = 8;
+	private static readonly int unknown2 = 3;
 
-	public CS2KV3? RED2 {get; set;}
-	public int RED2_Offset {get; set;} = 0;
-	public int RED2_Size {get; set;} = 0;
-
-	public string Data {get; set;}
-	public int Data_Offset {get; set;} = 0;
-	public int Data_Size {get; set;} = 0;
-
-	public CS2KV3? STAT {get; set;}
-	public int STAT_Offset {get; set;} = 0;
-	public int STAT_Size {get; set;} = 0;
+	private string Data;
 
 	internal CS2TypeScript(string path) {
 		using var streamFile = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -29,34 +18,34 @@ internal class CS2TypeScript
 	}
 
 	internal void Save(string fPath) {
-		this.Data_Size = this.Data.Length;
+		var data_Size = this.Data.Length;
 		var newData = new List<byte>();
 		var STATBytes = CS2KV3.Serialize(this.Data);
 		//13*4=52
-		this.FileSize = this.Data_Size + 52 + STATBytes.Length;
+		var FileSize = data_Size + 52 + STATBytes.Length;
 
-		newData.AddRange(BitConverter.GetBytes(this.FileSize));
-		newData.AddRange(BitConverter.GetBytes(this.unknown));
-		newData.AddRange(BitConverter.GetBytes(this.Version));
-		newData.AddRange(BitConverter.GetBytes(this.unknown2));
+		newData.AddRange(BitConverter.GetBytes(FileSize));
+		newData.AddRange(BitConverter.GetBytes(unknown));
+		newData.AddRange(BitConverter.GetBytes(Version));
+		newData.AddRange(BitConverter.GetBytes(unknown2));
 		newData.AddRange(Encoding.ASCII.GetBytes("RED2"));
-		newData.AddRange(BitConverter.GetBytes((int)0)); //offset
-		newData.AddRange(BitConverter.GetBytes((int)0)); //size
+		newData.AddRange(BitConverter.GetBytes(0)); // offset
+		newData.AddRange(BitConverter.GetBytes(0)); // size
 		newData.AddRange(Encoding.ASCII.GetBytes("DATA"));
-		newData.AddRange(BitConverter.GetBytes(20)); //offset
-		newData.AddRange(BitConverter.GetBytes(this.Data_Size)); //size
+		newData.AddRange(BitConverter.GetBytes(20)); // offset
+		newData.AddRange(BitConverter.GetBytes(data_Size)); // size
 		newData.AddRange(Encoding.ASCII.GetBytes("STAT"));
 
 		if (STATBytes.Length > 0) {
-			newData.AddRange(BitConverter.GetBytes(this.Data_Size + 8)); //offset
+			newData.AddRange(BitConverter.GetBytes(data_Size + 8)); //offset
 			newData.AddRange(BitConverter.GetBytes(STATBytes.Length)); //size
 		} else {
-			newData.AddRange(BitConverter.GetBytes((int)0)); //offset
-			newData.AddRange(BitConverter.GetBytes((int)0)); //size
+			newData.AddRange(BitConverter.GetBytes(0)); // offset
+			newData.AddRange(BitConverter.GetBytes(0)); // size
 		}
 
-		newData.AddRange(Encoding.ASCII.GetBytes(this.Data)); //size
-		newData.AddRange(STATBytes); //size
+		newData.AddRange(Encoding.ASCII.GetBytes(this.Data)); // size
+		newData.AddRange(STATBytes); // size
 		
 		File.WriteAllBytes(fPath, newData.ToArray());
 	}
